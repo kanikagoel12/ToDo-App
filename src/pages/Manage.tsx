@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { useTodos } from "@/hooks/useTodos";
 import type {Todo, TodoStatus, TodoDifficulty, TodoPriority} from "@/types/todo";
-import { Card, CardContent, CardTitle } from "@/components/ui/card";
+import {Card, CardContent, CardDescription, CardTitle} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { Pencil, Trash2 } from "lucide-react";
 
@@ -44,12 +46,14 @@ export default function Manage() {
     <div className="flex min-h-[80vh]">
       {/* Left: Form */}
       <form onSubmit={handleSubmit} className="w-1/2 p-8 flex flex-col gap-4 bg-white">
+        <Label>Title:</Label>
         <Input
           placeholder="Title"
           value={formData.title}
           onChange={e => handleChange("title", e.target.value)}
           required
         />
+        <Label>Description:</Label>
         <Textarea
           placeholder="Description"
           value={formData.description}
@@ -57,6 +61,7 @@ export default function Manage() {
           required
         />
         {/* Status Dropdown */}
+        <Label>Status:</Label>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline">{formData.status}</Button>
@@ -70,6 +75,7 @@ export default function Manage() {
           </DropdownMenuContent>
         </DropdownMenu>
         {/* Difficulty Dropdown */}
+        <Label>Difficulty:</Label>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline">{formData.difficulty}</Button>
@@ -83,6 +89,7 @@ export default function Manage() {
           </DropdownMenuContent>
         </DropdownMenu>
         {/* Priority Dropdown */}
+        <Label>Priority:</Label>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline">{formData.priority}</Button>
@@ -104,28 +111,42 @@ export default function Manage() {
         <Button type="submit">Add Todo</Button>
       </form>
       {/* Right: Todo List */}
-      <div className="w-1/2 p-8 bg-gray-50 flex flex-col gap-4">
+      <div className="w-1/2 p-8 bg-gray-50 flex flex-col gap-4 bg-gradient-to-br from-blue-200 to-purple-300">
         {todos.map(todo => (
           <Card key={todo.id} className="flex justify-between items-center p-4">
             <div>
               <CardTitle>{todo.title}</CardTitle>
-              <CardContent>
+              <CardDescription>
                 <p>{todo.description}</p>
-                <div className="flex gap-2 text-sm mt-2">
-                  <span>Status: {todo.status}</span>
-                  <span>Difficulty: {todo.difficulty}</span>
-                  <span>Priority: {todo.priority}</span>
-                  <span>Due: {todo.dueDate.toLocaleDateString()}</span>
-                </div>
-              </CardContent>
+              </CardDescription>
             </div>
-            <div className="flex gap-2">
-              <Button size="icon" variant="ghost">
+            <div className="flex gap-2 justify-between w-full mt-4">
+              <div className="left gap-3 flex w-5 h-7" >
+              <Badge className={
+                todo.status === "done" ? "bg-green-500 text-white" :
+                    todo.status === "in-progress" ? "bg-yellow-500 text-white" :
+                        "bg-gray-500 text-white"
+              }>{todo.status}</Badge>
+              <Badge className={
+                todo.difficulty === "Easy" ? "bg-green-400 text-white" :
+                    todo.difficulty === "Medium" ? "bg-yellow-200 text-white" :
+                        "bg-red-400 text-white"
+              }>{todo.difficulty}</Badge>
+              <Badge  className={
+                todo.priority === "High" ? "bg-red-500 text-white" :
+                    todo.priority === "Medium" ? "bg-yellow-500 text-white" :
+                        "bg-blue-500 text-white"
+              }>{todo.priority}</Badge>
+                <Badge className="bg-purple-200 text-purple-800">{todo.dueDate.toLocaleDateString()}</Badge>
+              </div>
+              <div className="right gap-2 flex">
+              <Button size="icon" variant="ghost" onClick={() => editTodo(todo.id)}>
                 <Pencil className="w-4 h-4" />
               </Button>
               <Button size="icon" variant="ghost" onClick={() => deleteTodo(todo.id)}>
                 <Trash2 className="w-4 h-4 text-red-500" />
               </Button>
+              </div>
             </div>
           </Card>
         ))}
